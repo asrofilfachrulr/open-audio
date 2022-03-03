@@ -110,11 +110,11 @@ class AlbumsHandler {
     try {
       const { id } = request.params;
 
-      await this._service.deleteNoteById(id);
+      await this._service.removeAlbumById(id);
 
       return {
         status: 'success',
-        message: 'Catatan berhasil dihapus',
+        message: `Album ${id} berhasil dihapus`,
       };
     } catch (error) {
       if (error instanceof ClientError) {

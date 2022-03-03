@@ -52,6 +52,18 @@ class AlbumsServices {
       throw new NotFoundError(`Gagal memperbarui album ${id}. Id tidak ditemukan`);
     }
   }
+
+  async removeAlbumById(id) {
+    const query = {
+      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      values: [id],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError(`Album ${id} gagal dihapus. Id tidak ditemukan`);
+    }
+  }
 }
 
 module.exports = AlbumsServices;
