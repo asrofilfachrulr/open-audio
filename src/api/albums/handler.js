@@ -13,16 +13,16 @@ class AlbumsHandler {
 
   async postAlbumHandler(request, h) {
     try {
-      this._validator.validateSongPayload(request.payload);
-      const { title = 'untitled', body, tags } = request.payload;
+      this._validator.validateAlbumPayload(request.payload);
+      const { name, year } = request.payload;
 
-      const noteId = await this._service.addNote({ title, body, tags });
+      const albumId = await this._service.addAlbum({ name, year });
 
       const response = h.response({
         status: 'success',
-        message: 'Catatan berhasil ditambahkan',
+        message: 'Album berhasil ditambahkan',
         data: {
-          noteId,
+          albumId,
         },
       });
       response.code(201);
