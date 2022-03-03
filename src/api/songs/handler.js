@@ -135,11 +135,11 @@ class SongsHandler {
     try {
       const { id } = request.params;
 
-      await this._service.deleteNoteById(id);
+      await this._service.removeSongById(id);
 
       return {
         status: 'success',
-        message: 'Catatan berhasil dihapus',
+        message: `Lagu ${id} berhasil dihapus`,
       };
     } catch (error) {
       if (error instanceof ClientError) {

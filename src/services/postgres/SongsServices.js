@@ -84,15 +84,15 @@ class SongsService {
     }
   }
 
-  async removeAlbumById(id) {
+  async removeSongById(id) {
     const query = {
-      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      text: 'DELETE FROM songs WHERE id = $1 RETURNING id',
       values: [id],
     };
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError(`Album ${id} gagal dihapus. Id tidak ditemukan`);
+      throw new NotFoundError(`Lagu ${id} gagal dihapus. Id tidak ditemukan`);
     }
   }
 }
