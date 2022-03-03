@@ -20,7 +20,7 @@ class AlbumsHandler {
 
       const response = h.response({
         status: 'success',
-        message: 'Album berhasil ditambahkan',
+        message: 'Album berhasil ditambahkan ke database',
         data: {
           albumId,
         },
@@ -38,7 +38,7 @@ class AlbumsHandler {
       }
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Internal Server Error',
       });
       response.code(500);
       console.error(error);
@@ -49,12 +49,12 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request, h) {
     try {
       const { id } = request.params;
-      const note = await this._service.getNoteById(id);
+      const album = await this._service.getAlbumById(id);
 
       return {
         status: 'success',
         data: {
-          note,
+          album,
         },
       };
     } catch (error) {
@@ -68,7 +68,7 @@ class AlbumsHandler {
       }
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Internal Server Error',
       });
       response.code(500);
       console.error(error);
@@ -98,7 +98,7 @@ class AlbumsHandler {
       }
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Internal Server Error',
       });
       response.code(500);
       console.error(error);
@@ -127,7 +127,7 @@ class AlbumsHandler {
       }
       const response = h.response({
         status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
+        message: 'Internal Server Error',
       });
       response.code(500);
       console.error(error);
