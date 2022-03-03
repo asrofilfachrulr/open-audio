@@ -33,14 +33,32 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
-    const query = {
-      text: 'SELECT * FROM songs',
-    };
+  async getSongs(params) {
+    let query = {};
+    if ('title' in params && 'performer' in params) {
+      query = {
+        text: 'SELECT * FROM songs WHERE title = $1 and performer = $2',
+        values: [params.title, params.performer],
+      };
+    } else if ('title' in params && !('performer' in params)) {
+      query = {
+        text: 'SELECT * FROM songs WHERE title = $1',
+        values: [params.title],
+      };
+    } else if (!('title' in params) && 'performer' in params) {
+      query = {
+        text: 'SELECT * FROM songs WHERE performer = $1',
+        values: [params.performer],
+      };
+    } else {
+      query = {
+        text: 'SELECT * FROM songs',
+      };
+    }
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Daftar lagu kosong');
+      throw new NotFoundError('Lagu tidak ditemukan');
     }
 
     return result.rows.map(mapDBToModel);
