@@ -103,14 +103,14 @@ class SongsHandler {
 
   async putSongByIdHandler(request, h) {
     try {
-      this._validator.validateNotePayload(request.payload);
+      this._validator.validateSongPayload(request.payload);
       const { id } = request.params;
 
-      await this._service.editNoteById(id, request.payload);
+      await this._service.updateSongById(id, request.payload);
 
       return {
         status: 'success',
-        message: 'Catatan berhasil diperbarui',
+        message: `Lagu ${id} berhasil diperbarui`,
       };
     } catch (error) {
       if (error instanceof ClientError) {

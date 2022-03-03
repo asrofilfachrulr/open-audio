@@ -57,19 +57,30 @@ class SongsService {
       throw new NotFoundError(`Lagu ${id} tidak ditemukan`);
     }
 
+    const albumId = result.rows[0].album_id;
+    delete result.rows[0].album_id;
+    result.rows[0].albumId = albumId;
+
     return result.rows[0];
   }
 
-  async updateAlbumById(id, { name, year }) {
+  async updateSongById(id, {
+    title,
+    year,
+    genre,
+    performer,
+    duration,
+    albumId,
+  }) {
     const query = {
-      text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
-      values: [name, year, id],
+      text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6  WHERE id = $7 RETURNING id',
+      values: [title, year, genre, performer, duration, albumId, id],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError(`Gagal memperbarui album ${id}. Id tidak ditemukan`);
+      throw new NotFoundError(`Gagal memperbarui lagu ${id}. Id tidak ditemukan`);
     }
   }
 
