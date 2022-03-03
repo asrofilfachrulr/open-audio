@@ -74,12 +74,12 @@ class SongsHandler {
   async getSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
-      const note = await this._service.getNoteById(id);
+      const song = await this._service.getSongById(id);
 
       return {
         status: 'success',
         data: {
-          note,
+          song,
         },
       };
     } catch (error) {
