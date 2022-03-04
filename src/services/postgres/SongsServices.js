@@ -2,7 +2,11 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const mapDBToModel = require('../../utils');
+const {
+  mapDBToModel,
+  filterPerformerSongByParam,
+  filterTitleSongByParam,
+} = require('../../utils');
 
 class SongsService {
   constructor() {
@@ -34,34 +38,26 @@ class SongsService {
   }
 
   async getSongs(params) {
-    let query = {};
-    if ('title' in params && 'performer' in params) {
-      query = {
-        text: 'SELECT * FROM songs WHERE title = $1 and performer = $2',
-        values: [params.title, params.performer],
-      };
-    } else if ('title' in params && !('performer' in params)) {
-      query = {
-        text: 'SELECT * FROM songs WHERE title = $1',
-        values: [params.title],
-      };
-    } else if (!('title' in params) && 'performer' in params) {
-      query = {
-        text: 'SELECT * FROM songs WHERE performer = $1',
-        values: [params.performer],
-      };
-    } else {
-      query = {
-        text: 'SELECT * FROM songs',
-      };
-    }
+    const query = {
+      text: 'SELECT * FROM songs',
+    };
+
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
 
-    return result.rows.map(mapDBToModel);
+    const songs = result.rows;
+    let filteredSong = songs;
+    if ('title' in params) {
+      filteredSong = filteredSong.filter((s) => filterTitleSongByParam(s, params.title));
+    }
+    if ('performer' in params) {
+      filteredSong = filteredSong.filter((s) => filterPerformerSongByParam(s, params.performer));
+    }
+
+    return filteredSong.map(mapDBToModel);
   }
 
   async getSongById(id) {
