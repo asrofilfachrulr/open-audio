@@ -47,20 +47,9 @@ class SongsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -77,20 +66,9 @@ class SongsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -107,20 +85,9 @@ class SongsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -136,20 +103,9 @@ class SongsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 }

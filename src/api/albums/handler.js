@@ -1,4 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
+const InternalServerError = require('../../exceptions/InternalServerError');
 
 class AlbumsHandler {
   constructor(service, validator) {
@@ -26,20 +27,9 @@ class AlbumsHandler {
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Internal Server Error',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -56,20 +46,9 @@ class AlbumsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Internal Server Error',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -86,20 +65,9 @@ class AlbumsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Internal Server Error',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
@@ -115,20 +83,9 @@ class AlbumsHandler {
       };
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Internal Server Error',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 }

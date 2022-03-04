@@ -3,8 +3,8 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 
 // exceptions
-const ClientError = require('../../exceptions/ClientError');
-const InternalServerError = require('../../exceptions/InternalServerError');
+const ClientError = require('./exceptions/ClientError');
+const InternalServerError = require('./exceptions/InternalServerError');
 
 // plugins
 const songs = require('./api/songs');
@@ -59,12 +59,11 @@ const init = async () => {
         newResponse.code(response.statusCode);
         return newResponse;
     } else if (response instanceof InternalServerError) {
-      const newResponse = h.response({
+        const newResponse = h.response({
         status: 'error',
         message: response.message,
       });
       newResponse.code(response.statusCode);
-      console.error(error);
       return newResponse;
     }
 
