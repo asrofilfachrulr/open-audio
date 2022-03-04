@@ -1,4 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
+const InternalServerError = require('../../exceptions/InternalServerError');
 
 class SongsHandler {
   constructor(service, validator) {
@@ -12,11 +13,11 @@ class SongsHandler {
     this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
-  async postSongHandler(request, h) {
+  async postSongHandler({payload}, h) {
     try {
-      this._validator.validateSongPayload(request.payload);
+      this._validator.validateSongPayload(payload);
 
-      const songId = await this._service.addSong(request.payload);
+      const songId = await this._service.addSong(payload);
 
       const response = h.response({
         status: 'success',
@@ -28,20 +29,9 @@ class SongsHandler {
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message,
-        });
-        response.code(error.statusCode);
-        return response;
+        return error;
       }
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf, terjadi kegagalan pada server kami.',
-      });
-      response.code(500);
-      console.error(error);
-      return response;
+      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
     }
   }
 
