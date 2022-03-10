@@ -5,6 +5,7 @@ class AlbumsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
+    this._interErrMsg = 'Maaf, terjadi kegagalan pada server kami';
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
@@ -12,10 +13,10 @@ class AlbumsHandler {
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
   }
 
-  async postAlbumHandler(request, h) {
+  async postAlbumHandler({ payload }, h) {
     try {
-      this._validator.validateAlbumPayload(request.payload);
-      const albumId = await this._service.addAlbum(request.payload);
+      this._validator.validateAlbumPayload(payload);
+      const albumId = await this._service.addAlbum(payload);
 
       const response = h.response({
         status: 'success',
@@ -29,13 +30,13 @@ class AlbumsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
-  async getAlbumByIdHandler(request) {
+  async getAlbumByIdHandler({ params }) {
     try {
-      const { id } = request.params;
+      const { id } = params;
       const album = await this._service.getAlbumById(id);
 
       return {
@@ -48,16 +49,16 @@ class AlbumsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
-  async putAlbumByIdHandler(request) {
+  async putAlbumByIdHandler({ payload, params }) {
     try {
-      this._validator.validateAlbumPayload(request.payload);
-      const { id } = request.params;
+      this._validator.validateAlbumPayload(payload);
+      const { id } = params;
 
-      await this._service.updateAlbumById(id, request.payload);
+      await this._service.updateAlbumById(id, payload);
 
       return {
         status: 'success',
@@ -67,13 +68,13 @@ class AlbumsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
-  async deleteAlbumByIdHandler(request) {
+  async deleteAlbumByIdHandler({ params }) {
     try {
-      const { id } = request.params;
+      const { id } = params;
 
       await this._service.removeAlbumById(id);
 
@@ -85,7 +86,7 @@ class AlbumsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 }
