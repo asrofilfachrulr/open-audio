@@ -21,8 +21,8 @@ class AuthHandler {
       const { username, password } = payload;
       const id = await this._usersService.verifyUserCredential(username, password);
 
-      const accessToken = this._tokenManager.generateAccessToken({ id });
-      const refreshToken = this._tokenManager.generateRefreshToken({ id });
+      const accessToken = this._tokenManager.generateAccessToken({ userId: id });
+      const refreshToken = this._tokenManager.generateRefreshToken({ userId: id });
 
       await this._authService.addRefreshToken(refreshToken);
 
@@ -51,7 +51,7 @@ class AuthHandler {
       await this._authService.verifyRefreshToken(refreshToken);
       const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
-      const accessToken = this._tokenManager.generateAccessToken({ id });
+      const accessToken = this._tokenManager.generateAccessToken({ userId: id });
       return {
         status: 'success',
         data: {

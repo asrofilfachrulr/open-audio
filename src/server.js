@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 
 // exceptions
 const ClientError = require('./exceptions/ClientError');
@@ -25,7 +26,7 @@ const UserValidator = require('./validator/users');
 const AuthValidator = require('./validator/authentications');
 
 // tokenize
-const tokenManager = require('./tokenize/TokenManager');
+const TokenManager = require('./tokenize/TokenManager');
 
 const init = async () => {
   const songsService = new SongsService();
@@ -41,6 +42,28 @@ const init = async () => {
         origin: ['*'],
       },
     },
+  });
+
+  await server.register([{
+    plugin: Jwt,
+  },
+  ]);
+
+  // mendefinisikan strategy autentikasi jwt
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        userId: artifacts.decoded.payload.userId,
+      },
+    }),
   });
 
   await server.register([{
@@ -69,7 +92,7 @@ const init = async () => {
     options: {
       authService,
       usersService,
-      tokenManager,
+      tokenManager: TokenManager,
       validator: AuthValidator,
     },
   }]);
