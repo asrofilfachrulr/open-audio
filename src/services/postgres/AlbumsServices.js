@@ -10,7 +10,7 @@ class AlbumsServices {
   }
 
   async addAlbum({ name, year }) {
-    const id = `album-${nanoid(16)}`;
+    const id = `alb@${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
