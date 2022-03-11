@@ -33,7 +33,7 @@ class AlbumsServices {
     };
     const resultAlbum = await this._pool.query(queryAlbum);
 
-    if (!resultAlbum.rows.length) {
+    if (!resultAlbum.rowCount) {
       throw new NotFoundError(`Album ${id} tidak ditemukan`);
     }
 
@@ -42,7 +42,7 @@ class AlbumsServices {
       values: [id],
     };
     const resultSong = await this._pool.query(querySongs);
-    if (!resultSong.rows.length) {
+    if (!resultSong.rowCount) {
       resultAlbum.rows[0].songs = [];
       return resultAlbum.rows[0];
     }
@@ -60,19 +60,19 @@ class AlbumsServices {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError(`Gagal memperbarui album ${id}. Id tidak ditemukan`);
     }
   }
 
   async removeAlbumById(id) {
     const query = {
-      text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+      text: 'DELETE FROM albums WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError(`Album ${id} gagal dihapus. Id tidak ditemukan`);
     }
   }
