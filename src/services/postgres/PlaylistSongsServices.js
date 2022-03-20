@@ -27,17 +27,27 @@ class PlaylistSongsServices {
   }
 
   async getPlaylistSongs(playlistId) {
-    const query = {
-      text: 'SELECT playlists.id, playlists.name, users.username FROM playlist_songs LEFT JOIN playlists ON playlists.id = playlist_id LEFT JOIN users ON users.id = playlists.owner WHERE playlists.id = $1',
+    const queryPlaylist = {
+      text: 'SELECT DISTINCT ON (playlists.id) playlists.id, playlists.name, users.username FROM playlist_songs LEFT JOIN playlists ON playlists.id = playlist_id LEFT JOIN users ON users.id = playlists.owner WHERE playlists.id = $1',
       values: [playlistId],
     };
 
-    const result = await this._pool.query(query);
+    const resultPlaylist = await this._pool.query(queryPlaylist);
 
-    if (!result.rowCount) {
+    if (!resultPlaylist.rowCount) {
       throw new NotFoundError(`Playlist ${playlistId} tidak ditemukan`);
     }
-    return result.rows;
+    const playlistSongs = resultPlaylist.rows;
+
+    const querySong = {
+      text: 'SELECT songs.id, songs.title, songs.performer FROM playlist_songs LEFT JOIN songs ON playlist_songs.song_id = songs.id WHERE playlist_songs.playlist_id = $1',
+      values: [playlistId],
+    };
+    const resultSong = await this._pool.query(querySong);
+
+    playlistSongs.songs = resultSong.rows;
+
+    return playlistSongs;
   }
 
   async deletePlaylistById(id) {
