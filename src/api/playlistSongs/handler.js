@@ -18,6 +18,7 @@ class PlaylistSongHandler {
     try {
       const { songId } = payload;
       this._validator.validatePlaylistSongPayload(payload);
+      await this._service.verifySongId(songId);
 
       await this._service.verifyPlaylistOwner(ownerId, id);
       await this._service.addPlaylistSong(id, songId);
@@ -42,11 +43,13 @@ class PlaylistSongHandler {
 
     try {
       await this._service.verifyPlaylistOwner(ownerId, id);
-      const playlists = await this._service.getPlaylistSongs(id);
+      const playlist = await this._service.getPlaylistSongs(id);
 
       return {
         status: 'success',
-        data: playlists,
+        data: {
+          playlist,
+        },
       };
     } catch (error) {
       if (error instanceof ClientError) {
@@ -62,7 +65,7 @@ class PlaylistSongHandler {
     const { songId } = payload;
 
     try {
-      await this._validator.validatePlaylistSongPayload(songId);
+      this._validator.validatePlaylistSongPayload(payload);
       await this._service.verifyPlaylistOwner(ownerId, id);
       await this._service.deletePlaylistSongById(songId);
 

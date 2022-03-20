@@ -13,7 +13,7 @@ class PlaylistSongsServices {
     const id = `plySg@${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3)',
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
       values: [id, playlistId, songId],
     };
 
@@ -35,7 +35,7 @@ class PlaylistSongsServices {
     if (!resultPlaylist.rowCount) {
       throw new NotFoundError(`Playlist ${playlistId} tidak ditemukan`);
     }
-    const playlistSongs = resultPlaylist.rows;
+    const playlistSongs = resultPlaylist.rows[0];
 
     const querySong = {
       text: 'SELECT songs.id, songs.title, songs.performer FROM playlist_songs LEFT JOIN songs ON playlist_songs.song_id = songs.id WHERE playlist_songs.playlist_id = $1',
@@ -75,6 +75,18 @@ class PlaylistSongsServices {
     const playlist = result.rows[0];
     if (playlist.owner !== ownerId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifySongId(songId) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [songId],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError(`Song ${songId} tidak ditemukan`);
     }
   }
 }
