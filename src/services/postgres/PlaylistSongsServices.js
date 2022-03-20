@@ -13,7 +13,7 @@ class PlaylistSongsServices {
     const id = `plySg@${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3)',
       values: [id, playlistId, songId],
     };
 
@@ -22,8 +22,6 @@ class PlaylistSongsServices {
     if (!result.rows[0].id) {
       throw new InvariantError(`Song ${songId}} gagal ditambahkan ke playlist ${playlistId}`);
     }
-
-    return result.rows[0].id;
   }
 
   async getPlaylistSongs(playlistId) {
@@ -50,16 +48,16 @@ class PlaylistSongsServices {
     return playlistSongs;
   }
 
-  async deletePlaylistById(id) {
+  async deletePlaylistSongById(songId) {
     const query = {
-      text: 'DELETE FROM playlists WHERE id = $1',
-      values: [id],
+      text: 'DELETE FROM playlist_songs WHERE song_id = $1',
+      values: [songId],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new InvariantError(`Playlist ${id} gagal dihapus`);
+      throw new InvariantError(`Playlist Song ${songId} gagal dihapus`);
     }
   }
 
