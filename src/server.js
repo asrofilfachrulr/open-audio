@@ -7,41 +7,9 @@ const Jwt = require('@hapi/jwt');
 const ClientError = require('./exceptions/ClientError');
 const InternalServerError = require('./exceptions/InternalServerError');
 
-// plugins
-const songs = require('./api/songs');
-const albums = require('./api/albums');
-const users = require('./api/users');
-const auth = require('./api/authentications');
-const playlists = require('./api/playlists');
-const playlistSongs = require('./api/playlistSongs');
-
-// services
-const SongsService = require('./services/postgres/SongsServices');
-const AlbumsService = require('./services/postgres/AlbumsServices');
-const UsersService = require('./services/postgres/UsersServices');
-const AuthService = require('./services/postgres/AuthenticationsServices');
-const PlaylistService = require('./services/postgres/PlaylistsServices');
-const PlaylistSongsService = require('./services/postgres/PlaylistSongsServices');
-
-// validators
-const SongValidator = require('./validator/songs');
-const AlbumValidator = require('./validator/albums');
-const UserValidator = require('./validator/users');
-const AuthValidator = require('./validator/authentications');
-const PlaylistValidator = require('./validator/playlists');
-const PlaylistSongsValidator = require('./validator/playlistSongs');
-
-// tokenize
-const TokenManager = require('./tokenize/TokenManager');
+const plugins = require('./init');
 
 const init = async () => {
-  const songsService = new SongsService();
-  const albumsService = new AlbumsService();
-  const usersService = new UsersService();
-  const authService = new AuthService();
-  const playlistsService = new PlaylistService();
-  const playlistSongsService = new PlaylistSongsService();
-
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -74,50 +42,7 @@ const init = async () => {
     }),
   });
 
-  await server.register([{
-    plugin: songs,
-    options: {
-      service: songsService,
-      validator: SongValidator,
-    },
-  },
-  {
-    plugin: albums,
-    options: {
-      service: albumsService,
-      validator: AlbumValidator,
-    },
-  },
-  {
-    plugin: users,
-    options: {
-      service: usersService,
-      validator: UserValidator,
-    },
-  },
-  {
-    plugin: playlists,
-    options: {
-      service: playlistsService,
-      validator: PlaylistValidator,
-    },
-  },
-  {
-    plugin: playlistSongs,
-    options: {
-      service: playlistSongsService,
-      validator: PlaylistSongsValidator,
-    },
-  },
-  {
-    plugin: auth,
-    options: {
-      authService,
-      usersService,
-      tokenManager: TokenManager,
-      validator: AuthValidator,
-    },
-  }]);
+  await server.register(plugins);
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
