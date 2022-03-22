@@ -8,16 +8,15 @@ class CollaborationsHandler {
     this._usersService = usersService;
     this._validator = validator;
     this._interErrMsg = 'Maaf, terjadi kegagalan pada server kami';
-
-    this._postCollaborationsHandler = this.postCollaborationsHandler.bind(this);
-    this._deleteCollaborationsHandler = this.deleteCollaborationsHandler.bind(this);
+    this.postCollaborationsHandler = this.postCollaborationsHandler.bind(this);
+    this.deleteCollaborationsHandler = this.deleteCollaborationsHandler.bind(this);
   }
 
   async postCollaborationsHandler({ payload, auth }, h) {
     try {
       this._validator.validateCollaborationsPayload(payload);
       const { playlistId, userId: collaboratorId } = payload;
-      const { userId: ownerId } = auth;
+      const { userId: ownerId } = auth.credentials;
       await this._playlistsService.verifyPlaylistOwner(ownerId, playlistId);
 
       await this._usersService.getUserById(collaboratorId);
@@ -33,7 +32,6 @@ class CollaborationsHandler {
       response.code(201);
       return response;
     } catch (error) {
-      console.log(error);
       if (error instanceof ClientError) {
         return error;
       }
@@ -46,7 +44,7 @@ class CollaborationsHandler {
       this._validator.validateCollaborationsPayload(payload);
       const { playlistId, userId: collaboratorId } = payload;
 
-      const { userId: ownerId } = auth;
+      const { userId: ownerId } = auth.credentials;
       await this._playlistsService.verifyPlaylistOwner(ownerId, playlistId);
 
       await this._collaborationsService.deleteCollaboration(playlistId, collaboratorId);

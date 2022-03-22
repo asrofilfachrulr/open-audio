@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class CollaborationsServices {
   constructor() {
@@ -34,6 +35,19 @@ class CollaborationsServices {
 
     if (!result.rowCount) {
       throw new InvariantError(`Gagal menghapus collaborator user ${userId} pada playlist ${playlistId}`);
+    }
+  }
+
+  async verifyCollaborator(playlistId, collaboratorId) {
+    const query = {
+      text: 'SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+      values: [playlistId, collaboratorId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
   }
 }
