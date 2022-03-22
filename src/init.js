@@ -30,8 +30,8 @@ const albumsService = new AlbumsService();
 const usersService = new UsersService();
 const authService = new AuthService();
 const playlistsService = new PlaylistService();
-const playlistSongsService = new PlaylistSongsService();
 const collaborationsService = new CollaborationsService();
+const playlistSongsService = new PlaylistSongsService(collaborationsService);
 
 // tokenize
 const TokenManager = require('./tokenize/TokenManager');

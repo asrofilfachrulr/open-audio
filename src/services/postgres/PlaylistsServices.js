@@ -33,10 +33,6 @@ class PlaylistsServices {
     };
 
     const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new NotFoundError(`Playlist milik user ${ownerId} tidak ditemukan`);
-    }
     return result.rows;
   }
 
