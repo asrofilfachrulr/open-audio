@@ -2,9 +2,9 @@ const ClientError = require('../../exceptions/ClientError');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
 class PlaylistSongHandler {
-  constructor(playlistSongService, activitiesService, validator) {
-    this._playlistSongService = playlistSongService;
-    this._activitiesService = activitiesService;
+  constructor(playlistSongsService, playlistSongActivitiesService, validator) {
+    this._playlistSongsService = playlistSongsService;
+    this._playlistSongActivitiesService = playlistSongActivitiesService;
     this._validator = validator;
     this._interErrMsg = 'Maaf, terjadi kegagalan pada server kami';
 
@@ -19,11 +19,11 @@ class PlaylistSongHandler {
     try {
       const { songId } = payload;
       this._validator.validatePlaylistSongPayload(payload);
-      await this._playlistSongService.verifySongId(songId);
+      await this._playlistSongsService.verifySongId(songId);
 
-      await this._playlistSongService.verifyPlaylistOwner(userId, playlistId);
-      await this._playlistSongService.addPlaylistSong(playlistId, songId);
-      await this._activitiesService.addActivity(playlistId, songId, userId, 'add');
+      await this._playlistSongsService.verifyPlaylistOwner(userId, playlistId);
+      await this._playlistSongsService.addPlaylistSong(playlistId, songId);
+      await this._playlistSongActivitiesService.addActivity(playlistId, songId, userId, 'add');
 
       const response = h.response({
         status: 'success',
@@ -44,8 +44,8 @@ class PlaylistSongHandler {
     const { id } = params;
 
     try {
-      await this._playlistSongService.verifyPlaylistOwner(ownerId, id);
-      const playlist = await this._playlistSongService.getPlaylistSongs(id);
+      await this._playlistSongsService.verifyPlaylistOwner(ownerId, id);
+      const playlist = await this._playlistSongsService.getPlaylistSongs(id);
 
       return {
         status: 'success',
@@ -68,9 +68,9 @@ class PlaylistSongHandler {
 
     try {
       this._validator.validatePlaylistSongPayload(payload);
-      await this._playlistSongService.verifyPlaylistOwner(userId, playlistId);
-      await this._playlistSongService.deletePlaylistSongById(songId);
-      await this._activitiesService.addActivity(playlistId, songId, userId, 'delete');
+      await this._playlistSongsService.verifyPlaylistOwner(userId, playlistId);
+      await this._playlistSongsService.deletePlaylistSongById(songId);
+      await this._playlistSongActivitiesService.addActivity(playlistId, songId, userId, 'delete');
 
       return {
         status: 'success',

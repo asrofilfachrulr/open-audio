@@ -2,6 +2,8 @@ class PlaylistSongActivitiesHandler {
   constructor(playlistService, activityService) {
     this._activityService = activityService;
     this._playlistService = playlistService;
+
+    this.getActivityByIdHandler = this.getActivityByIdHandler.bind(this);
   }
 
   async getActivityByIdHandler({ params, auth }) {

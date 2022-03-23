@@ -4,9 +4,9 @@ const routes = require('./routes');
 module.exports = {
   name: 'playlist_song_activities',
   version: '1.0.0',
-  register: async (server, { playlistService, playlistSongActivitiesService }) => {
+  register: async (server, { playlistsService, playlistSongActivitiesService }) => {
     // eslint-disable-next-line max-len
-    const playlistSongActivitiesHandler = new PlaylistSongActivitiesHandler(playlistService, playlistSongActivitiesService);
+    const playlistSongActivitiesHandler = new PlaylistSongActivitiesHandler(playlistsService, playlistSongActivitiesService);
     server.route(routes(playlistSongActivitiesHandler));
   },
 };

@@ -70,7 +70,8 @@ module.exports = [{
 {
   plugin: playlistSongs,
   options: {
-    service: playlistSongsService,
+    playlistSongsService,
+    playlistSongActivitiesService,
     validator: PlaylistSongsValidator,
   },
 },
