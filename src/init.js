@@ -6,6 +6,7 @@ const auth = require('./api/authentications');
 const playlists = require('./api/playlists');
 const playlistSongs = require('./api/playlistSongs');
 const collaborations = require('./api/collaborations');
+const playlistSongActivities = require('./api/playlistSongActivities');
 
 // services
 const SongsService = require('./services/postgres/SongsServices');
@@ -15,6 +16,7 @@ const AuthService = require('./services/postgres/AuthenticationsServices');
 const PlaylistService = require('./services/postgres/PlaylistsServices');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsServices');
 const CollaborationsService = require('./services/postgres/CollaborationsServices');
+const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongActivitiesServices');
 
 // validators
 const SongValidator = require('./validator/songs');
@@ -32,6 +34,7 @@ const authService = new AuthService();
 const playlistsService = new PlaylistService();
 const collaborationsService = new CollaborationsService();
 const playlistSongsService = new PlaylistSongsService(collaborationsService);
+const playlistSongActivitiesService = new PlaylistSongActivitiesService();
 
 // tokenize
 const TokenManager = require('./tokenize/TokenManager');
@@ -78,6 +81,13 @@ module.exports = [{
     playlistsService,
     usersService,
     validator: CollaborationsValidator,
+  },
+},
+{
+  plugin: playlistSongActivities,
+  options: {
+    playlistsService,
+    playlistSongActivitiesService,
   },
 },
 {

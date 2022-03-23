@@ -49,16 +49,16 @@ class PlaylistsServices {
     }
   }
 
-  async verifyPlaylistOwner(ownerId, id) {
+  async verifyPlaylistOwner(ownerId, playlistId) {
     const query = {
       text: 'SELECT * FROM playlists WHERE playlists.id = $1',
-      values: [id],
+      values: [playlistId],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new NotFoundError(`Playlist ${id} tidak ditemukan`);
+      throw new NotFoundError(`Playlist ${playlistId} tidak ditemukan`);
     }
     const playlist = result.rows[0];
     if (playlist.owner !== ownerId) {
