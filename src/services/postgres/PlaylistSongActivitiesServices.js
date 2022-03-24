@@ -25,7 +25,7 @@ class PlaylistSongActivities {
 
   async getActivityByPlaylistId(id) {
     const query = {
-      text: 'SELECT users.username, songs.title, playlist_song_activities.action, playlist_song_activities.time FROM playlist_song_activities LEFT JOIN playlists ON playlist_song_activities.playlist_id = playlists.id LEFT JOIN users ON playlists.owner = users.id LEFT JOIN playlist_songs ON playlists.id = playlist_songs.playlist_id LEFT JOIN songs ON playlist_songs.song_id = songs.id WHERE playlist_song_activities.playlist_id = $1',
+      text: 'SELECT u.username, s.title, a.action, a.time FROM playlist_song_activities a LEFT JOIN users u ON a.user_id = u.id LEFT JOIN songs s ON a.song_id = s.id WHERE a.playlist_id = $1',
       values: [id],
     };
 
