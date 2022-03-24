@@ -31,9 +31,9 @@ const songsService = new SongsService();
 const albumsService = new AlbumsService();
 const usersService = new UsersService();
 const authService = new AuthService();
-const playlistsService = new PlaylistService();
 const collaborationsService = new CollaborationsService();
-const playlistSongsService = new PlaylistSongsService(collaborationsService);
+const playlistsService = new PlaylistService(collaborationsService);
+const playlistSongsService = new PlaylistSongsService();
 const playlistSongActivitiesService = new PlaylistSongActivitiesService();
 
 // tokenize
@@ -70,6 +70,8 @@ module.exports = [{
 {
   plugin: playlistSongs,
   options: {
+    songsService,
+    playlistsService,
     playlistSongsService,
     playlistSongActivitiesService,
     validator: PlaylistSongsValidator,

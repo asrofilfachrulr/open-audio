@@ -5,7 +5,8 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsServices {
-  constructor() {
+  constructor(collaboratorService) {
+    this._collaboratorService = collaboratorService;
     this._pool = new Pool();
   }
 
@@ -26,10 +27,10 @@ class PlaylistsServices {
     return result.rows[0].id;
   }
 
-  async getPlaylists(ownerId) {
+  async getPlaylists(userId) {
     const query = {
       text: 'SELECT playlists.id, playlists.name, users.username FROM playlists LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id INNER JOIN users ON users.id = playlists.owner WHERE playlists.owner = $1 OR collaborations.user_id = $1;',
-      values: [ownerId],
+      values: [userId],
     };
 
     const result = await this._pool.query(query);
@@ -49,20 +50,35 @@ class PlaylistsServices {
     }
   }
 
-  async verifyPlaylistOwner(ownerId, playlistId) {
+  async verifyPlaylistOwner(userId, id) {
     const query = {
       text: 'SELECT * FROM playlists WHERE playlists.id = $1',
-      values: [playlistId],
+      values: [id],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
-      throw new NotFoundError(`Playlist ${playlistId} tidak ditemukan`);
+      throw new NotFoundError(`Playlist ${id} tidak ditemukan`);
     }
     const playlist = result.rows[0];
-    if (playlist.owner !== ownerId) {
+    if (playlist.owner !== userId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyPlaylistAccess(userId, id) {
+    try {
+      await this.verifyPlaylistOwner(userId, id);
+    } catch (error) {
+      if (error.statusCode === 404) {
+        throw new NotFoundError(`Playlist ${id} tidak ditemukan`);
+      }
+      try {
+        await this._collaboratorService.verifyCollaborator(id, userId);
+      } catch {
+        throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+      }
     }
   }
 }

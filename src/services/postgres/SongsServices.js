@@ -108,6 +108,14 @@ class SongsService {
       throw new NotFoundError(`Lagu ${id} gagal dihapus. Id tidak ditemukan`);
     }
   }
+
+  async verifySongId(id) {
+    try {
+      await this.getSongById(id);
+    } catch (error) {
+      throw new NotFoundError(`Lagu ${id} tidak ditemukan`);
+    }
+  }
 }
 
 module.exports = SongsService;

@@ -2,12 +2,10 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistSongsServices {
-  constructor(CollaboratorService) {
+  constructor() {
     this._pool = new Pool();
-    this._collaboratorService = CollaboratorService;
   }
 
   async addPlaylistSong(playlistId, songId) {
@@ -59,39 +57,6 @@ class PlaylistSongsServices {
 
     if (!result.rowCount) {
       throw new InvariantError(`Playlist Song ${songId} gagal dihapus`);
-    }
-  }
-
-  async verifyPlaylistOwner(ownerId, id) {
-    const query = {
-      text: 'SELECT * FROM playlists WHERE playlists.id = $1',
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new NotFoundError(`Playlist ${id} tidak ditemukan`);
-    }
-    const playlist = result.rows[0];
-    if (playlist.owner !== ownerId) {
-      try {
-        await this._collaboratorService.verifyCollaborator(id, ownerId);
-      } catch (error) {
-        throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
-      }
-    }
-  }
-
-  async verifySongId(songId) {
-    const query = {
-      text: 'SELECT * FROM songs WHERE id = $1',
-      values: [songId],
-    };
-    const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new NotFoundError(`Song ${songId} tidak ditemukan`);
     }
   }
 }

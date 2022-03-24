@@ -2,7 +2,10 @@ const ClientError = require('../../exceptions/ClientError');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
 class PlaylistSongHandler {
-  constructor(playlistSongsService, playlistSongActivitiesService, validator) {
+  // eslint-disable-next-line max-len
+  constructor(songsService, playlistsService, playlistSongsService, playlistSongActivitiesService, validator) {
+    this._songsService = songsService;
+    this._playlistsService = playlistsService;
     this._playlistSongsService = playlistSongsService;
     this._playlistSongActivitiesService = playlistSongActivitiesService;
     this._validator = validator;
@@ -19,9 +22,9 @@ class PlaylistSongHandler {
     try {
       const { songId } = payload;
       this._validator.validatePlaylistSongPayload(payload);
-      await this._playlistSongsService.verifySongId(songId);
+      await this._songsService.verifySongId(songId);
 
-      await this._playlistSongsService.verifyPlaylistOwner(userId, playlistId);
+      await this._playlistsService.verifyPlaylistAccess(userId, playlistId);
       await this._playlistSongsService.addPlaylistSong(playlistId, songId);
       await this._playlistSongActivitiesService.addActivity(playlistId, songId, userId, 'add');
 
@@ -44,7 +47,7 @@ class PlaylistSongHandler {
     const { id } = params;
 
     try {
-      await this._playlistSongsService.verifyPlaylistOwner(ownerId, id);
+      await this._playlistsService.verifyPlaylistAccess(ownerId, id);
       const playlist = await this._playlistSongsService.getPlaylistSongs(id);
 
       return {
@@ -68,7 +71,7 @@ class PlaylistSongHandler {
 
     try {
       this._validator.validatePlaylistSongPayload(payload);
-      await this._playlistSongsService.verifyPlaylistOwner(userId, playlistId);
+      await this._playlistsService.verifyPlaylistAccess(userId, playlistId);
       await this._playlistSongsService.deletePlaylistSongById(songId);
       await this._playlistSongActivitiesService.addActivity(playlistId, songId, userId, 'delete');
 
