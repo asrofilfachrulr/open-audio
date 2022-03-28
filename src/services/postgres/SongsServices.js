@@ -48,12 +48,12 @@ class SongsService {
     }
 
     const songs = result.rows;
-    let filteredSong = songs;
+    let filteredSong;
     if ('title' in params) {
-      filteredSong = filteredSong.filter((s) => filterTitleSongByParam(s, params.title));
+      filteredSong = songs.filter((s) => filterTitleSongByParam(s, params.title));
     }
     if ('performer' in params) {
-      filteredSong = filteredSong.filter((s) => filterPerformerSongByParam(s, params.performer));
+      filteredSong = songs.filter((s) => filterPerformerSongByParam(s, params.performer));
     }
 
     return filteredSong;
