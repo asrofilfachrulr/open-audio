@@ -44,7 +44,7 @@ const collaborationsService = new CollaborationsService();
 const playlistsService = new PlaylistService(collaborationsService);
 const playlistSongsService = new PlaylistSongsService();
 const playlistSongActivitiesService = new PlaylistSongActivitiesService();
-const storageService = new StorageService(path.resolve(__dirname, 'uploads/file/covers'));
+const storageService = new StorageService(path.resolve(__dirname, 'api/coverUploads/file'));
 
 // tokenize
 const TokenManager = require('./tokenize/TokenManager');

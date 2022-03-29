@@ -1,3 +1,5 @@
+require('dotenv').config();
+const fs = require('fs');
 const ClientError = require('../../exceptions/ClientError');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
@@ -16,16 +18,18 @@ class CoverUploadsHandler {
       const { cover } = payload;
       const { id } = params;
 
-      await this._albumsService.verifyAlbumById(id);
-
-      if (!cover.hapi) {
-        throw new ClientError('format file salah');
-      }
-      console.log(`cover header: ${JSON.stringify(cover.hapi.headers)}`);
-
       await this._validator.validateImageHeaders(cover.hapi.headers);
-      const url = await this._storageService.writeFile(cover, cover.hapi);
-      await this._albumsService.updateCoverURL(id, `localhost:8080/upload/${url}`);
+
+      const album = await this._albumsService.getOnlyAlbumById(id);
+
+      // delete cover photo related to playlist
+      if (album.cover) {
+        await fs.unlink(`${__dirname}/file/${album.cover.split('/')[4]}`, (err) => {
+          if (err) console.log(err);
+        });
+      }
+      const filename = await this._storageService.writeFile(cover, cover.hapi);
+      await this._albumsService.updateCoverURL(id, `http://${process.env.HOST}:${process.env.PORT}/upload/${filename}`);
 
       const response = h.response({
         status: 'success',
@@ -37,7 +41,7 @@ class CoverUploadsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      console.log(error);
+
       return new InternalServerError(this._interErrMsg);
     }
   }
