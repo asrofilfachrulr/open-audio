@@ -2,8 +2,9 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
-class PlaylistSongActivities {
-  constructor() {
+class PlaylistSongActivitiesService {
+  constructor(cacheService) {
+    this._cacheService = cacheService;
     this._pool = new Pool();
   }
 
@@ -21,18 +22,25 @@ class PlaylistSongActivities {
     if (!result.rowCount) {
       throw new InternalServerError('Error dalam me-logging aktivitas');
     }
+    await this._cacheService.delete(`activities:${playlistId}`);
   }
 
-  async getActivityByPlaylistId(id) {
-    const query = {
-      text: 'SELECT u.username, s.title, a.action, a.time FROM playlist_song_activities a LEFT JOIN users u ON a.user_id = u.id LEFT JOIN songs s ON a.song_id = s.id WHERE a.playlist_id = $1',
-      values: [id],
-    };
+  async getActivityByPlaylistId(playlistId) {
+    try {
+      const result = await this._cacheService.get(`activities:${playlistId}`);
+      return JSON.parse(result);
+    } catch (error) {
+      const query = {
+        text: 'SELECT u.username, s.title, a.action, a.time FROM playlist_song_activities a LEFT JOIN users u ON a.user_id = u.id LEFT JOIN songs s ON a.song_id = s.id WHERE a.playlist_id = $1',
+        values: [playlistId],
+      };
 
-    const result = await this._pool.query(query);
+      const result = await this._pool.query(query);
 
-    return result.rows;
+      await this._cacheService.set(`activities:${playlistId}`, JSON.stringify(result.rows));
+      return result.rows;
+    }
   }
 }
 
-module.exports = PlaylistSongActivities;
+module.exports = PlaylistSongActivitiesService;

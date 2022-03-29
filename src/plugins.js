@@ -39,6 +39,7 @@ const ExportValidator = require('./validator/exports');
 const CoverUploadValidator = require('./validator/coverUploads');
 
 // instantiation service
+const cacheService = new CacheService();
 const songsService = new SongsService();
 const albumsService = new AlbumsService();
 const usersService = new UsersService();
@@ -46,9 +47,8 @@ const authService = new AuthService();
 const collaborationsService = new CollaborationsService();
 const playlistsService = new PlaylistService(collaborationsService);
 const playlistSongsService = new PlaylistSongsService();
-const playlistSongActivitiesService = new PlaylistSongActivitiesService();
+const playlistSongActivitiesService = new PlaylistSongActivitiesService(cacheService);
 const storageService = new StorageService(path.resolve(__dirname, 'api/coverUploads/file'));
-const cacheService = new CacheService();
 const userAlbumLikesService = new UserAlbumLikesService(cacheService);
 
 // tokenize
