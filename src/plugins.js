@@ -25,6 +25,7 @@ const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongA
 const ExportProducerService = require('./services/rabbitmq/ExportProducerService');
 const StorageService = require('./services/storage/StorageService');
 const UserAlbumLikesService = require('./services/postgres/UserAlbumLikesServices');
+const CacheService = require('./services/redis/CacheService');
 
 // validators
 const SongValidator = require('./validator/songs');
@@ -47,7 +48,8 @@ const playlistsService = new PlaylistService(collaborationsService);
 const playlistSongsService = new PlaylistSongsService();
 const playlistSongActivitiesService = new PlaylistSongActivitiesService();
 const storageService = new StorageService(path.resolve(__dirname, 'api/coverUploads/file'));
-const userAlbumLikesService = new UserAlbumLikesService();
+const cacheService = new CacheService();
+const userAlbumLikesService = new UserAlbumLikesService(cacheService);
 
 // tokenize
 const TokenManager = require('./tokenize/TokenManager');
