@@ -1,3 +1,4 @@
+const fs = require('fs');
 const ClientError = require('../../exceptions/ClientError');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
@@ -75,7 +76,13 @@ class AlbumsHandler {
   async deleteAlbumByIdHandler({ params }) {
     try {
       const { id } = params;
+      const album = await this._service.getOnlyAlbumById(id);
 
+      if (album.cover) {
+        await fs.unlink(`${__dirname}/../coverUploads/file/${album.cover.split('/')[4]}`, (err) => {
+          if (err) console.log(err);
+        });
+      }
       await this._service.removeAlbumById(id);
 
       return {
@@ -86,6 +93,7 @@ class AlbumsHandler {
       if (error instanceof ClientError) {
         return error;
       }
+      console.log(error);
       return new InternalServerError(this._interErrMsg);
     }
   }

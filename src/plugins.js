@@ -1,3 +1,5 @@
+const path = require('path');
+
 // plugins
 const songs = require('./api/songs');
 const albums = require('./api/albums');
@@ -7,6 +9,9 @@ const playlists = require('./api/playlists');
 const playlistSongs = require('./api/playlistSongs');
 const collaborations = require('./api/collaborations');
 const playlistSongActivities = require('./api/playlistSongActivities');
+const exportsapi = require('./api/exports');
+const coverUploads = require('./api/coverUploads');
+const likes = require('./api/likes');
 
 // services
 const SongsService = require('./services/postgres/SongsServices');
@@ -17,6 +22,10 @@ const PlaylistService = require('./services/postgres/PlaylistsServices');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsServices');
 const CollaborationsService = require('./services/postgres/CollaborationsServices');
 const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongActivitiesServices');
+const ExportProducerService = require('./services/rabbitmq/ExportProducerService');
+const StorageService = require('./services/storage/StorageService');
+const UserAlbumLikesService = require('./services/postgres/UserAlbumLikesServices');
+const CacheService = require('./services/redis/CacheService');
 
 // validators
 const SongValidator = require('./validator/songs');
@@ -26,7 +35,11 @@ const AuthValidator = require('./validator/authentications');
 const PlaylistValidator = require('./validator/playlists');
 const PlaylistSongsValidator = require('./validator/playlistSongs');
 const CollaborationsValidator = require('./validator/collaborations');
+const ExportValidator = require('./validator/exports');
+const CoverUploadValidator = require('./validator/coverUploads');
 
+// instantiation service
+const cacheService = new CacheService();
 const songsService = new SongsService();
 const albumsService = new AlbumsService();
 const usersService = new UsersService();
@@ -34,7 +47,9 @@ const authService = new AuthService();
 const collaborationsService = new CollaborationsService();
 const playlistsService = new PlaylistService(collaborationsService);
 const playlistSongsService = new PlaylistSongsService();
-const playlistSongActivitiesService = new PlaylistSongActivitiesService();
+const playlistSongActivitiesService = new PlaylistSongActivitiesService(cacheService);
+const storageService = new StorageService(path.resolve(__dirname, 'api/coverUploads/file'));
+const userAlbumLikesService = new UserAlbumLikesService(cacheService);
 
 // tokenize
 const TokenManager = require('./tokenize/TokenManager');
@@ -91,6 +106,29 @@ module.exports = [{
   options: {
     playlistsService,
     playlistSongActivitiesService,
+  },
+},
+{
+  plugin: exportsapi,
+  options: {
+    exportProducerService: ExportProducerService,
+    playlistsService,
+    validator: ExportValidator,
+  },
+},
+{
+  plugin: coverUploads,
+  options: {
+    storageService,
+    albumsService,
+    validator: CoverUploadValidator,
+  },
+},
+{
+  plugin: likes,
+  options: {
+    userAlbumLikesService,
+    albumsService,
   },
 },
 {

@@ -47,16 +47,16 @@ class SongsService {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
 
-    const songs = result.rows;
-    let filteredSong = songs;
+    let songs = result.rows;
+
     if ('title' in params) {
-      filteredSong = filteredSong.filter((s) => filterTitleSongByParam(s, params.title));
+      songs = songs.filter((s) => filterTitleSongByParam(s, params.title));
     }
     if ('performer' in params) {
-      filteredSong = filteredSong.filter((s) => filterPerformerSongByParam(s, params.performer));
+      songs = songs.filter((s) => filterPerformerSongByParam(s, params.performer));
     }
 
-    return filteredSong;
+    return songs;
   }
 
   async getSongById(id) {

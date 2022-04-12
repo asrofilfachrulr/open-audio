@@ -2,12 +2,13 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
 
 // exceptions
 const ClientError = require('./exceptions/ClientError');
 const InternalServerError = require('./exceptions/InternalServerError');
 
-const plugins = require('./init');
+const plugins = require('./plugins');
 
 const init = async () => {
   const server = Hapi.server({
@@ -20,9 +21,13 @@ const init = async () => {
     },
   });
 
-  await server.register([{
-    plugin: Jwt,
-  },
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+    {
+      plugin: Inert,
+    },
   ]);
 
   // mendefinisikan strategy autentikasi jwt
@@ -42,6 +47,7 @@ const init = async () => {
     }),
   });
 
+  // plugin terdapat pada file ./plugins.js
   await server.register(plugins);
 
   server.ext('onPreResponse', (request, h) => {
