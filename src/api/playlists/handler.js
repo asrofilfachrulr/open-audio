@@ -1,27 +1,28 @@
 const ClientError = require('../../exceptions/ClientError');
 const InternalServerError = require('../../exceptions/InternalServerError');
 
-class AlbumsHandler {
+class PlaylistsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
     this._interErrMsg = 'Maaf, terjadi kegagalan pada server kami';
 
-    this.postAlbumHandler = this.postAlbumHandler.bind(this);
-    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
-    this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
-    this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
+    this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
+    this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
+    this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
   }
 
-  async postAlbumHandler({ payload }, h) {
+  async postPlaylistHandler({ payload, auth }, h) {
     try {
-      this._validator.validateAlbumPayload(payload);
-      const albumId = await this._service.addAlbum(payload);
+      this._validator.validatePlaylistPayload(payload);
+      const { name } = payload;
+      const { userId: ownerId } = auth.credentials;
+      const playlistId = await this._service.addPlaylist(ownerId, name);
 
       const response = h.response({
         status: 'success',
         data: {
-          albumId,
+          playlistId,
         },
       });
       response.code(201);
@@ -34,15 +35,15 @@ class AlbumsHandler {
     }
   }
 
-  async getAlbumByIdHandler({ params }) {
+  async getPlaylistsHandler({ auth }) {
     try {
-      const { id } = params;
-      const album = await this._service.getAlbumById(id);
+      const { userId: ownerId } = auth.credentials;
+      const playlists = await this._service.getPlaylists(ownerId);
 
       return {
         status: 'success',
         data: {
-          album,
+          playlists,
         },
       };
     } catch (error) {
@@ -53,30 +54,12 @@ class AlbumsHandler {
     }
   }
 
-  async putAlbumByIdHandler({ payload, params }) {
-    try {
-      this._validator.validateAlbumPayload(payload);
-      const { id } = params;
-
-      await this._service.updateAlbumById(id, payload);
-
-      return {
-        status: 'success',
-        message: `Album ${id} berhasil diperbarui`,
-      };
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return error;
-      }
-      return new InternalServerError(this._interErrMsg);
-    }
-  }
-
-  async deleteAlbumByIdHandler({ params }) {
+  async deletePlaylistByIdHandler({ params, auth }) {
     try {
       const { id } = params;
-
-      await this._service.removeAlbumById(id);
+      const { userId: ownerId } = auth.credentials;
+      await this._service.verifyPlaylistOwner(ownerId, id);
+      await this._service.deletePlaylistById(id);
 
       return {
         status: 'success',
@@ -91,4 +74,4 @@ class AlbumsHandler {
   }
 }
 
-module.exports = AlbumsHandler;
+module.exports = PlaylistsHandler;

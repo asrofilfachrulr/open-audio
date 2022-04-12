@@ -20,7 +20,7 @@ class SongsService {
     duration,
     albumId,
   }) {
-    const id = `song-${nanoid(16)}`;
+    const id = `sg@${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
@@ -106,6 +106,14 @@ class SongsService {
 
     if (!result.rowCount) {
       throw new NotFoundError(`Lagu ${id} gagal dihapus. Id tidak ditemukan`);
+    }
+  }
+
+  async verifySongId(id) {
+    try {
+      await this.getSongById(id);
+    } catch (error) {
+      throw new NotFoundError(`Lagu ${id} tidak ditemukan`);
     }
   }
 }

@@ -5,6 +5,7 @@ class SongsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
+    this._interErrMsg = 'Maaf, terjadi kegagalan pada server kami';
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
@@ -31,7 +32,7 @@ class SongsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
@@ -49,7 +50,7 @@ class SongsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
@@ -68,7 +69,7 @@ class SongsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
@@ -87,7 +88,7 @@ class SongsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 
@@ -105,7 +106,7 @@ class SongsHandler {
       if (error instanceof ClientError) {
         return error;
       }
-      return new InternalServerError('Maaf, terjadi kegagalan pada server kami');
+      return new InternalServerError(this._interErrMsg);
     }
   }
 }
